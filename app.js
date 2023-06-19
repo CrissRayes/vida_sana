@@ -3,6 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
+const errorHandler = require('./controller/errorController');
 
 const app = express();
 
@@ -22,7 +23,7 @@ app.all('*', (req, res, next) => {
 });
 
 // Error handler
-// app.use(errorHandler);
+app.use(errorHandler);
 
 // Start server
 const port = process.env.PORT || 3000;
