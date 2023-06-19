@@ -52,9 +52,22 @@ const createUser = async (user) => {
   await pool.query(sqlQuery, values);
 };
 
+// editar evento
+const updateEvent = async (titulo, descripcion, id) => {
+  const sqlQuery =
+    'UPDATE eventos SET titulo = $1, descripcion = $2 WHERE id = $3';
+  const values = [titulo, descripcion, id];
+  const { rowCount } = await pool.query(sqlQuery, values);
+
+  if (rowCount === 0) {
+    throw new Error('No se ha encontrado ningún evento con ese id');
+  }
+};
+
 module.exports = {
   allEvents,
   validateCredentials,
   checkEmail,
   createUser,
+  updateEvent,
 };

@@ -4,12 +4,13 @@ const {
   validateCredentials,
   checkEmail,
   createUser,
+  updateEvent,
 } = require('../models/queries');
 
 // Custom middlewares
 
 // verificar que el payload tenga email y password
-const checkPayload = (req, res, next) => {
+const checkUserPayload = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
     const error = new Error('Faltan campos');
@@ -31,6 +32,17 @@ const authenticateToken = (req, res, next) => {
     error.statusCode = 401;
     return next(error);
   }
+
+  const token = authorization.split(' ')[1];
+  jwt.verify(token, process.env.JWT_SECRET, (err) => {
+    if (err) {
+      const error = new Error('Token inválido');
+      error.status = 'fail';
+      error.statusCode = 401;
+      return next(error);
+    }
+    next();
+  });
 };
 
 // Route handlers
@@ -80,10 +92,24 @@ const newUser = async (req, res, next) => {
   }
 };
 
+const editEvent = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { titulo, descripcion } = req.body;
+    await updateEvent(titulo, descripcion, id);
+    res.send('Evento modificado exitósamente');
+  } catch (error) {
+    error.status = 'fail';
+    error.statusCode = 404;
+    return next(error);
+  }
+};
+
 module.exports = {
+  authenticateToken,
+  checkUserPayload,
+  editEvent,
   getAllEvents,
   loginUser,
-  checkPayload,
-  authenticateToken,
   newUser,
 };
